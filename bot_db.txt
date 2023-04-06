@@ -1,0 +1,25 @@
+CREATE TABLE bot_info (
+	curr_week integer NOT NULL
+);
+
+CREATE TABLE subject (
+	subject_id integer PRIMARY KEY,
+	subject_name text NOT NULL
+);
+
+CREATE TABLE teacher (
+	teacher_id serial PRIMARY KEY,
+	full_name text NOT NULL,
+	subject integer NOT NULL,
+	FOREIGN KEY (subject) REFERENCES subject(subject_id)
+);
+
+CREATE TABLE timetable (
+	"id" serial PRIMARY KEY,
+	week integer NOT NULL,
+	day_name text NOT NULL,
+	subject integer NOT NULL,
+	room_numb integer NOT NULL,
+	start_time time NOT NULL,
+	FOREIGN KEY (subject) REFERENCES subject(subject_id)
+);
