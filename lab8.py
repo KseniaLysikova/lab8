@@ -158,7 +158,7 @@ class MainWindow(QWidget):
             self.monday_table.setCellWidget(i, 4, joinButton)
             joinButton.clicked.connect(lambda ch, num=i: self._change_day_from_table(num))
             self.monday_table.setCellWidget(i, 5, delButton)
-            delButton.clicked.connect(lambda ch, num=i: self._delete_row(num))
+            delButton.clicked.connect(lambda ch, num=r[0]: self._delete_row(num))
         self.monday_table.resizeRowsToContents()
 
     def _update_tuesday_table(self):
@@ -180,7 +180,7 @@ class MainWindow(QWidget):
             self.tuesday_table.setCellWidget(i, 4, joinButton)
             joinButton.clicked.connect(lambda ch, num=i: self._change_day_from_table(num))
             self.tuesday_table.setCellWidget(i, 5, delButton)
-            delButton.clicked.connect(lambda ch, num=i: self._delete_row(num))
+            delButton.clicked.connect(lambda ch, num=r[0]: self._delete_row(num))
         self.tuesday_table.resizeRowsToContents()
 
     def _update_wednesday_table(self):
@@ -202,7 +202,7 @@ class MainWindow(QWidget):
             self.wednesday_table.setCellWidget(i, 4, joinButton)
             joinButton.clicked.connect(lambda ch, num=i: self._change_day_from_table(num))
             self.wednesday_table.setCellWidget(i, 5, delButton)
-            delButton.clicked.connect(lambda ch, num=i: self._delete_row(num))
+            delButton.clicked.connect(lambda ch, num=r[0]: self._delete_row(num))
         self.wednesday_table.resizeRowsToContents()
 
     def _update_thursday_table(self):
@@ -224,7 +224,7 @@ class MainWindow(QWidget):
             self.thursday_table.setCellWidget(i, 4, joinButton)
             joinButton.clicked.connect(lambda ch, num=i: self._change_day_from_table(num))
             self.thursday_table.setCellWidget(i, 5, delButton)
-            delButton.clicked.connect(lambda ch, num=i: self._delete_row(num))
+            delButton.clicked.connect(lambda ch, num=r[0]: self._delete_row(num))
         self.thursday_table.resizeRowsToContents()
 
     def _update_friday_table(self):
@@ -246,7 +246,7 @@ class MainWindow(QWidget):
             self.friday_table.setCellWidget(i, 4, joinButton)
             joinButton.clicked.connect(lambda ch, num=i: self._change_day_from_table(num))
             self.friday_table.setCellWidget(i, 5, delButton)
-            delButton.clicked.connect(lambda ch, num=i: self._delete_row(num))
+            delButton.clicked.connect(lambda ch, num=r[0]: self._delete_row(num))
         self.friday_table.resizeRowsToContents()
 
     def _update_saturday_table(self):
@@ -268,7 +268,7 @@ class MainWindow(QWidget):
             self.saturday_table.setCellWidget(i, 4, joinButton)
             joinButton.clicked.connect(lambda ch, num=i: self._change_day_from_table(num))
             self.saturday_table.setCellWidget(i, 5, delButton)
-            delButton.clicked.connect(lambda ch, num=i: self._delete_row(num))
+            delButton.clicked.connect(lambda ch, num=r[0]: self._delete_row(num))
         self.saturday_table.resizeRowsToContents()
 
     def _create_subject_tab(self):
@@ -310,10 +310,10 @@ class MainWindow(QWidget):
             delButton = QPushButton("Delete")
             self.subject_table.setItem(i, 0, QTableWidgetItem(str(r[0])))
             self.subject_table.setItem(i, 1, QTableWidgetItem(str(r[1])))
-            self.subject_table.setCellWidget(len(records), 2, joinButton)
-            joinButton.clicked.connect(lambda ch, num=i: self._change_day_from_table(num))
+            self.subject_table.setCellWidget(i, 2, joinButton)
+            joinButton.clicked.connect(lambda ch, num=r[0]: self._change_day_from_table(num))
             self.subject_table.setCellWidget(i, 3, delButton)
-            delButton.clicked.connect(lambda ch, num=i: self._delete_row(num))
+            delButton.clicked.connect(lambda ch, num=r[0]: self._delete_row(num))
         self.subject_table.resizeRowsToContents()
 
     def _create_teacher_tab(self):
@@ -359,32 +359,27 @@ class MainWindow(QWidget):
             self.teacher_table.setCellWidget(i, 3, joinButton)
             joinButton.clicked.connect(lambda ch, num=i: self._change_day_from_table(num))
             self.teacher_table.setCellWidget(i, 4, delButton)
-            delButton.clicked.connect(lambda ch, num=i: self._delete_row(num))
+            delButton.clicked.connect(lambda ch, num=r[0]: self._delete_row(num))
         self.teacher_table.resizeRowsToContents()
 
     def _change_day_from_table(self, rowNum):
         row = list()
 
-        for i in range(self.subject_table.columnCount()):
+        for i in range(self.monday_table.columnCount()):
             try:
-                row.append(self.subject_table.item(rowNum + 1, i).text())
+                row.append(self.monday_table.item(rowNum + 1, i).text())
             except:
                 row.append(None)
         try:
             self.cursor.execute(
-                "INSERT INTO subject (subject_id, subject_name) VALUES " + "(" + str(row[0]) + ", " + str(row[1]) + ")")
+                f"INSERT INTO {self.monday_table} VALUES", (row[0], row[1], row[2]))
             self.conn.commit()
         except:
             QMessageBox.about(self, "Error", "Enter all fields")
 
     def _delete_row(self, rowNum):
-        try:
-            self.cursor.execute(f"DELETE FROM {self.table_name} WHERE id = %s", (rowNum,))
-        except ForeignKeyViolation:
-            QMessageBox.critical(self, "Operation is not possible", "Foreign key violation")
-        except:
-            QMessageBox.about(self, "Error", "Error has acquired")
-
+        self.cursor.execute("DELETE FROM subject WHERE subject_id=" + str(rowNum))
+        self.conn.commit()
         self._update_contents()
 
     def _update_contents(self):
