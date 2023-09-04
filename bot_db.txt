@@ -2,7 +2,7 @@ CREATE TABLE bot_info (
 	curr_week integer NOT NULL
 );
 
-CREATE TABLE subject (
+CREATE TABLE subjects (
 	subject_id integer PRIMARY KEY,
 	subject_name text NOT NULL
 );
